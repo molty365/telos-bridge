@@ -73,7 +73,7 @@ export function createWallets(chains: ChainId[]): Record<string, Wallet<unknown>
     showQrModal: true,
     optionalChains: evmChains,
     rpcMap: {
-      [ChainListId.TELOS]: 'https://mainnet.telos.net:443/evm',
+      [ChainListId.TELOS]: 'https://rpc.telos.net',
       [ChainListId.POLYGON]: 'https://polygon-rpc.com/',
       [ChainListId.ARBITRUM]: 'https://arb1.arbitrum.io/rpc',
       [ChainListId.BNB]: 'https://bsc-dataseed.binance.org/',
