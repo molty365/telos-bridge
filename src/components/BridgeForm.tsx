@@ -210,7 +210,7 @@ export default function BridgeForm() {
               </div>
 
               {/* Amount input */}
-              <div className="flex flex-col gap-4 relative rounded-2xl px-4 pt-6 pb-5 mb-0.5 md:mb-1 border border-transparent focus-within:border-[var(--border)] transition-colors" style={mutedStyle}>
+              <div className="flex flex-col gap-4 relative z-20 rounded-2xl px-4 pt-6 pb-5 mb-0.5 md:mb-1 border border-transparent focus-within:border-[var(--border)] transition-colors" style={mutedStyle}>
                 <div className="flex gap-2 items-start">
                   <textarea
                     inputMode="decimal"
