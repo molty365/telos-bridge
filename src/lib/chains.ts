@@ -124,8 +124,8 @@ export const supportedTokens = [
     name: 'Telos',
     logo: '🟢',
     addresses: {
-      40: '0x0000000000000000000000000000000000000000',
-      // Add wrapped TLOS addresses on other chains
+      1: '0x7825e833d495f3d1c28872415a4aee339d26ac88',   // pTokens TLOS on Ethereum
+      40: '0x0000000000000000000000000000000000000000',    // Native TLOS
     },
   },
 ]

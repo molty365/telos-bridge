@@ -67,7 +67,8 @@ export const TOKEN_ADDRESSES: Record<string, Record<number, string>> = {
     40: '0x0555E30da8f98308EdB960aa94C0Db47230d2B9c', // WBTC on Telos (Stargate), 8 decimals
   },
   TLOS: {
-    40: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+    1: '0x7825e833d495f3d1c28872415a4aee339d26ac88',   // pTokens TLOS on Ethereum
+    40: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',  // Native TLOS
   },
 }
 
