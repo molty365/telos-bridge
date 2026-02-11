@@ -3,7 +3,6 @@ import { Chain } from 'viem'
 export const telos: Chain = {
   id: 40,
   name: 'Telos',
-  network: 'telos',
   nativeCurrency: {
     decimals: 18,
     name: 'Telos',
@@ -11,12 +10,10 @@ export const telos: Chain = {
   },
   rpcUrls: {
     default: {
-      http: ['https://mainnet.telos.net/evm'],
-      webSocket: ['wss://mainnet.telos.net/ws'],
+      http: ['https://rpc.telos.net'],
     },
     public: {
-      http: ['https://mainnet.telos.net/evm'],
-      webSocket: ['wss://mainnet.telos.net/ws'],
+      http: ['https://rpc.telos.net'],
     },
   },
   blockExplorers: {
