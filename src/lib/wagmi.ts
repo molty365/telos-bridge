@@ -5,7 +5,7 @@ import { telos } from './chains'
 
 export const config = getDefaultConfig({
   appName: 'Telos Bridge',
-  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || 'default-project-id',
+  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || '3fcc6bba6f1de962d911bb5b5c3dba68',
   chains: [mainnet, telos, base, bsc, arbitrum, polygon, avalanche, optimism],
   transports: {
     [mainnet.id]: http('https://eth-mainnet.g.alchemy.com/v2/demo'),

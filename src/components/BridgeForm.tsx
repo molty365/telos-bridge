@@ -6,15 +6,17 @@ import { supportedChains, supportedTokens } from '@/lib/chains'
 import { useStargateBridge } from '@/hooks/useStargateBridge'
 import { StargateService } from '@/lib/stargate'
 
+const BASE = process.env.NODE_ENV === 'production' ? '/telos-bridge' : ''
+
 const CHAIN_ICONS: Record<number, string> = {
-  1: '/img/ethereum.svg',
-  40: '/img/telos.svg',
-  8453: '/img/base.svg',
-  56: '/img/bsc.svg',
-  42161: '/img/arbitrum.svg',
-  137: '/img/polygon.svg',
-  43114: '/img/avalanche.svg',
-  10: '/img/optimism.svg',
+  1: `${BASE}/img/ethereum.svg`,
+  40: `${BASE}/img/telos.svg`,
+  8453: `${BASE}/img/base.svg`,
+  56: `${BASE}/img/bsc.svg`,
+  42161: `${BASE}/img/arbitrum.svg`,
+  137: `${BASE}/img/polygon.svg`,
+  43114: `${BASE}/img/avalanche.svg`,
+  10: `${BASE}/img/optimism.svg`,
 }
 
 const TOKEN_ICONS: Record<string, string> = {
@@ -22,7 +24,7 @@ const TOKEN_ICONS: Record<string, string> = {
   USDT: 'https://s3.us-east-2.amazonaws.com/assets.rollbridge.app/3a709a5a46c21b802170e.png',
   ETH: 'https://static.optimism.io/data/ETH/logo.svg',
   wBTC: 'https://s3.us-east-2.amazonaws.com/assets.rollbridge.app/f01685ddbd453909e33f9.png',
-  TLOS: '/img/telos.svg',
+  TLOS: `${BASE}/img/telos.svg`,
 }
 
 export default function BridgeForm() {
