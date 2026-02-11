@@ -66,10 +66,7 @@ export const TOKEN_ADDRESSES: Record<string, Record<number, string>> = {
     1: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
     40: '0x0555E30da8f98308EdB960aa94C0Db47230d2B9c', // WBTC on Telos (Stargate), 8 decimals
   },
-  TLOS: {
-    1: '0x7825e833d495f3d1c28872415a4aee339d26ac88',   // pTokens TLOS on Ethereum
-    40: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',  // Native TLOS
-  },
+  // TLOS: OFT bridge needed (not Stargate) — excluded from Stargate quotes
 }
 
 export class StargateService {
