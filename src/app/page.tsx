@@ -3,11 +3,19 @@ import BridgeForm from '@/components/BridgeForm'
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-background-light dark:bg-background-dark text-text-primary dark:text-primary-dark">
+    <div className="relative w-screen h-screen overflow-hidden" style={{ backgroundColor: 'var(--background)', color: 'var(--foreground)' }}>
+      {/* Background pattern */}
+      <div className="bg-pattern fixed inset-0 pointer-events-none" />
+      
+      {/* Header */}
       <Header />
-      <div className="container mx-auto px-4 py-8">
-        <BridgeForm />
+      
+      {/* Main content */}
+      <div className="fixed inset-0 flex items-start justify-center overflow-y-auto overflow-x-hidden">
+        <div className="w-full max-w-xl px-2 md:px-0 mt-24 sm:mt-28 mb-24">
+          <BridgeForm />
+        </div>
       </div>
-    </main>
+    </div>
   )
 }

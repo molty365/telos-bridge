@@ -1,48 +1,73 @@
 @import 'tailwindcss';
 
+@font-face {
+  font-family: 'sb-heading';
+  src: url('https://superbridge-fonts.vercel.app/GT-Maru-Bold.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'sb-button';
+  src: url('https://superbridge-fonts.vercel.app/GT-Maru-Bold.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'sb-body';
+  src: url('https://superbridge-fonts.vercel.app/GT-Maru-Medium.woff2') format('woff2');
+  font-display: swap;
+}
+
+:root {
+  --background: hsl(240 5% 96%);
+  --foreground: hsl(240 10% 3.9%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(240 10% 3.9%);
+  --muted: hsl(240 4.8% 95.9%);
+  --muted-foreground: hsl(240 3.8% 46.1%);
+  --border: hsl(240 5.9% 90%);
+  --primary: hsl(240 5.9% 10%);
+  --primary-foreground: hsl(0 0% 98%);
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: hsl(240 6% 7%);
+  --foreground: hsl(0 0% 98%);
+  --card: hsl(240 6% 10%);
+  --card-foreground: hsl(0 0% 98%);
+  --muted: hsl(240 4% 16%);
+  --muted-foreground: hsl(240 5% 64.9%);
+  --border: hsl(240 3.7% 15.9%);
+  --primary: hsl(0 0% 98%);
+  --primary-foreground: hsl(240 5.9% 10%);
+}
+
 * {
   box-sizing: border-box;
-  padding: 0;
   margin: 0;
+  padding: 0;
 }
 
-html,
+html {
+  font-family: sb-body, SFRounded, ui-rounded, 'SF Pro Rounded', system-ui, 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
 body {
-  max-width: 100vw;
+  background-color: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
   overflow-x: hidden;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+/* Superbridge-style background image overlay */
+.bg-pattern {
+  background-image: url('https://s3.us-east-2.amazonaws.com/assets.rollbridge.app/a385cc1be136962a22ea7.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.1;
+  mix-blend-mode: normal;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-}
-
-/* Custom background pattern for Telos brand */
-.telos-background {
-  background: 
-    radial-gradient(circle at 25% 25%, rgba(0, 242, 254, 0.1) 0%, transparent 25%),
-    radial-gradient(circle at 75% 75%, rgba(79, 172, 254, 0.1) 0%, transparent 25%),
-    radial-gradient(circle at 50% 50%, rgba(196, 113, 245, 0.05) 0%, transparent 50%);
-}
-
-/* Smooth transitions */
-* {
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+.dark .bg-pattern {
+  background-image: url('https://s3.us-east-2.amazonaws.com/assets.rollbridge.app/d7b117125c9a7f883197b.svg');
 }

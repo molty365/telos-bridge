@@ -9,7 +9,7 @@ export const config = getDefaultConfig({
   chains: [mainnet, telos, base, bsc, arbitrum, polygon, avalanche, optimism],
   transports: {
     [mainnet.id]: http('https://eth-mainnet.g.alchemy.com/v2/demo'),
-    [telos.id]: http('https://mainnet.telos.net/evm'),
+    [telos.id]: http('https://rpc.telos.net'),
     [base.id]: http('https://mainnet.base.org'),
     [bsc.id]: http('https://bsc-dataseed.binance.org'),
     [arbitrum.id]: http('https://arb1.arbitrum.io/rpc'),
