@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useAccount, useConnect, useDisconnect, useBalance } from 'wagmi'
+import { useAccount } from 'wagmi'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { supportedChains, supportedTokens } from '@/lib/chains'
 import { useStargateBridge } from '@/hooks/useStargateBridge'
 import { StargateService } from '@/lib/stargate'
@@ -29,8 +30,6 @@ const TOKEN_ICONS: Record<string, string> = {
 
 export default function BridgeForm() {
   const { address, isConnected } = useAccount()
-  const { connect, connectors } = useConnect()
-  const { disconnect } = useDisconnect()
 
   const [fromChainIdx, setFromChainIdx] = useState(0) // Ethereum
   const [toChainIdx, setToChainIdx] = useState(1)     // Telos
@@ -90,10 +89,6 @@ export default function BridgeForm() {
         slippage: 0.5,
       })
     } catch {}
-  }
-
-  const handleConnect = () => {
-    if (connectors[0]) connect({ connector: connectors[0] })
   }
 
   const protocolFee = amount ? StargateService.calculateProtocolFee(amount) : '0'
@@ -274,35 +269,43 @@ export default function BridgeForm() {
         {/* Action button */}
         <div className="w-full">
           <div className="flex flex-col gap-4 py-4 justify-start items-center w-full">
-            {!isConnected ? (
-              <button
-                onClick={handleConnect}
-                className="w-full h-14 rounded-full overflow-hidden gap-2 flex items-center justify-center shadow backdrop-blur-sm transition-all hover:scale-[1.03] relative"
-                style={cardStyle}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" className="w-6 h-6 p-0.5" style={{ fill: 'var(--foreground)' }}>
-                  <path d="M12.15 2H1.85C0.83 2 0 2.83 0 3.85V10.55C0 11.57 0.83 12.4 1.85 12.4H12.15C13.17 12.4 14 11.57 14 10.55V3.85C14 2.83 13.17 2 12.15 2ZM12.48 5.43C12.48 5.63 12.32 5.79 12.12 5.79H8.49C8.33 5.79 8.18 5.9 8.14 6.06C8.02 6.57 7.55 6.96 7 6.96C6.45 6.96 5.99 6.57 5.87 6.06C5.83 5.9 5.67 5.79 5.51 5.79H1.89C1.69 5.79 1.53 5.63 1.53 5.43V4.2C1.53 3.8 1.85 3.48 2.25 3.48H11.76C12.15 3.48 12.48 3.8 12.48 4.2V5.43Z"/>
-                </svg>
-                <span style={{ fontFamily: 'sb-button', color: 'var(--foreground)' }}>Connect wallet</span>
-              </button>
-            ) : (
-              <div className="flex flex-col gap-2 w-full">
-                <div className="text-center text-sm" style={mutedFg}>
-                  {address?.slice(0, 6)}...{address?.slice(-4)}
-                  <button onClick={() => disconnect()} className="ml-2 text-xs underline opacity-60 hover:opacity-100">disconnect</button>
-                </div>
-                <button
-                  onClick={handleBridge}
-                  disabled={!amount || isBridging}
-                  className="w-full h-14 rounded-full flex items-center justify-center transition-all hover:scale-[1.03] disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={primaryBg}
-                >
-                  <span style={{ fontFamily: 'sb-button' }}>
-                    {isBridging ? 'Bridging...' : amount ? 'Bridge' : 'Enter amount'}
-                  </span>
-                </button>
-              </div>
-            )}
+            <ConnectButton.Custom>
+              {({ account, chain, openConnectModal, openAccountModal, mounted }) => {
+                const connected = mounted && account && chain
+                return (
+                  <div className="w-full">
+                    {!connected ? (
+                      <button
+                        onClick={openConnectModal}
+                        className="w-full h-14 rounded-full overflow-hidden gap-2 flex items-center justify-center shadow backdrop-blur-sm transition-all hover:scale-[1.03] relative"
+                        style={cardStyle}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" className="w-6 h-6 p-0.5" style={{ fill: 'var(--foreground)' }}>
+                          <path d="M12.15 2H1.85C0.83 2 0 2.83 0 3.85V10.55C0 11.57 0.83 12.4 1.85 12.4H12.15C13.17 12.4 14 11.57 14 10.55V3.85C14 2.83 13.17 2 12.15 2ZM12.48 5.43C12.48 5.63 12.32 5.79 12.12 5.79H8.49C8.33 5.79 8.18 5.9 8.14 6.06C8.02 6.57 7.55 6.96 7 6.96C6.45 6.96 5.99 6.57 5.87 6.06C5.83 5.9 5.67 5.79 5.51 5.79H1.89C1.69 5.79 1.53 5.63 1.53 5.43V4.2C1.53 3.8 1.85 3.48 2.25 3.48H11.76C12.15 3.48 12.48 3.8 12.48 4.2V5.43Z"/>
+                        </svg>
+                        <span style={{ fontFamily: 'sb-button', color: 'var(--foreground)' }}>Connect wallet</span>
+                      </button>
+                    ) : (
+                      <div className="flex flex-col gap-2 w-full">
+                        <button onClick={openAccountModal} className="text-center text-sm py-2" style={mutedFg}>
+                          {account.displayName}
+                        </button>
+                        <button
+                          onClick={handleBridge}
+                          disabled={!amount || isBridging}
+                          className="w-full h-14 rounded-full flex items-center justify-center transition-all hover:scale-[1.03] disabled:opacity-50 disabled:cursor-not-allowed"
+                          style={primaryBg}
+                        >
+                          <span style={{ fontFamily: 'sb-button' }}>
+                            {isBridging ? 'Bridging...' : amount ? 'Bridge' : 'Enter amount'}
+                          </span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )
+              }}
+            </ConnectButton.Custom>
 
             {/* Error */}
             {error && (
