@@ -119,5 +119,17 @@ export const supportedTokens = [
       // Add other chain addresses
     },
   },
-  // TLOS requires OFT bridge (LayerZero) — not available via Stargate yet
+  {
+    symbol: 'TLOS',
+    name: 'Telos',
+    logo: '🟢',
+    addresses: {
+      1: '0x193f4A4a6ea24102F49b931DEeeb931f6E32405d',
+      40: '0x0000000000000000000000000000000000000000',
+      56: '0x193f4A4a6ea24102F49b931DEeeb931f6E32405d',
+      42161: '0x193f4A4a6ea24102F49b931DEeeb931f6E32405d',
+      137: '0x193f4A4a6ea24102F49b931DEeeb931f6E32405d',
+      43114: '0xed667dC80a45b77305Cc395DB56D997597Dc6DdD',
+    },
+  },
 ]
