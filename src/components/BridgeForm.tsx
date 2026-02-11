@@ -140,7 +140,7 @@ export default function BridgeForm() {
                     src={CHAIN_ICONS[fromChain.id] || '/img/ethereum.svg'}
                     alt={fromChain.name}
                     className="w-12 h-12 rounded-lg"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                    
                   />
                   <div className="flex flex-col gap-0.5">
                     <span className="text-xs leading-none" style={mutedFg}>From</span>
@@ -157,7 +157,7 @@ export default function BridgeForm() {
                           style={i === fromChainIdx ? mutedStyle : {}}
                           onClick={(e) => { e.stopPropagation(); setFromChainIdx(i); setShowFromChains(false); reset() }}
                         >
-                          <img src={CHAIN_ICONS[c.id]} alt={c.name} className="w-8 h-8 rounded-lg" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                          <img src={CHAIN_ICONS[c.id]} alt={c.name} className="w-8 h-8 rounded-lg"  />
                           <span style={{ fontFamily: 'sb-button' }}>{c.name}</span>
                         </button>
                       ))}
@@ -186,7 +186,7 @@ export default function BridgeForm() {
                     src={CHAIN_ICONS[toChain.id] || '/img/telos.svg'}
                     alt={toChain.name}
                     className="w-12 h-12 rounded-lg"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                    
                   />
                   <div className="flex flex-col gap-0.5 md:text-right">
                     <span className="text-xs leading-none" style={mutedFg}>To</span>
@@ -203,7 +203,7 @@ export default function BridgeForm() {
                           style={i === toChainIdx ? mutedStyle : {}}
                           onClick={(e) => { e.stopPropagation(); setToChainIdx(i); setShowToChains(false); reset() }}
                         >
-                          <img src={CHAIN_ICONS[c.id]} alt={c.name} className="w-8 h-8 rounded-lg" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                          <img src={CHAIN_ICONS[c.id]} alt={c.name} className="w-8 h-8 rounded-lg"  />
                           <span style={{ fontFamily: 'sb-button' }}>{c.name}</span>
                         </button>
                       ))}
