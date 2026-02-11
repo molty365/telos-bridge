@@ -38,7 +38,7 @@ export const CHAIN_KEYS: Record<number, string> = {
 export const TOKEN_ADDRESSES: Record<string, Record<number, string>> = {
   USDC: {
     1: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-    40: '0x6Bd193Ee6D2104F14F94E2cA6efefae561A4334B',
+    40: '0xF1815bd50389c46847f0Bda824eC8da914045D14', // USDC.e on Telos (Stargate)
     8453: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
     56: '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d',
     42161: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
@@ -48,7 +48,7 @@ export const TOKEN_ADDRESSES: Record<string, Record<number, string>> = {
   },
   USDT: {
     1: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-    40: '0x975Ed13fa16857E83e7C493C7741D556eaaD4A3f',
+    40: '0x674843C06FF83502ddb4D37c2E09C01cdA38cbc8', // Stargate USDT on Telos
     56: '0x55d398326f99059fF775485246999027B3197955',
     42161: '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9',
     137: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
@@ -57,14 +57,14 @@ export const TOKEN_ADDRESSES: Record<string, Record<number, string>> = {
   },
   ETH: {
     1: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
-    40: '0xa9F9088040B0140d9a6b157E05E0F1e78A33446e',
+    40: '0xBAb93B7ad7fE8692A878B95a8e689423437cc500', // WETH on Telos (Stargate)
     8453: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
     42161: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
     10: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
   },
   wBTC: {
     1: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
-    40: '0xf390830df829cf22c53c8840554b98eafC5dCBc2',
+    40: '0x0555E30da8f98308EdB960aa94C0Db47230d2B9c', // WBTC on Telos (Stargate), 8 decimals
   },
   TLOS: {
     40: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
@@ -139,6 +139,8 @@ export class StargateService {
   }
 
   static getTokenDecimals(symbol: string): number {
-    return ['USDC', 'USDT'].includes(symbol) ? 6 : 18
+    if (['USDC', 'USDT'].includes(symbol)) return 6
+    if (symbol === 'wBTC') return 8
+    return 18
   }
 }
