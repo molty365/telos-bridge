@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAccount } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { supportedChains, supportedTokens } from '@/lib/chains'
@@ -39,6 +39,7 @@ export default function BridgeForm() {
   const [showToChains, setShowToChains] = useState(false)
   const [showTokens, setShowTokens] = useState(false)
 
+  const quoteTimer = useRef<NodeJS.Timeout | null>(null)
   const fromChain = supportedChains[fromChainIdx]
   const toChain = supportedChains[toChainIdx]
   const token = supportedTokens[tokenIdx]
@@ -60,12 +61,13 @@ export default function BridgeForm() {
     reset()
   }
 
-  const handleAmountChange = async (value: string) => {
+  const handleAmountChange = (value: string) => {
     setAmount(value)
     reset()
+    if (quoteTimer.current) clearTimeout(quoteTimer.current)
     if (value && parseFloat(value) > 0) {
-      try {
-        await getQuote({
+      quoteTimer.current = setTimeout(() => {
+        getQuote({
           fromChainId: fromChain.id,
           toChainId: toChain.id,
           fromToken: token.symbol,
@@ -73,7 +75,7 @@ export default function BridgeForm() {
           amount: value,
           slippage: 0.5,
         })
-      } catch {}
+      }, 500)
     }
   }
 
@@ -258,7 +260,12 @@ export default function BridgeForm() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center text-xs" style={mutedFg}>
                     {isQuoting && <span>Getting quote...</span>}
-                    {quote && amount && <span>Fee: {protocolFee} {token.symbol} (0.06%)</span>}
+                    {quote && amount && !isQuoting && (
+                      <span>
+                        You receive ~{(parseFloat(quote.dstAmount) / (10 ** (['USDC','USDT'].includes(token.symbol) ? 6 : 18))).toFixed(4)} {token.symbol}
+                        {quote.duration && <> · ~{Math.ceil(quote.duration.estimated / 60)}min</>}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

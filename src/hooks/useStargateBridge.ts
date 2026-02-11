@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { useAccount, useWriteContract } from 'wagmi'
-import { parseUnits, encodeFunctionData } from 'viem'
+import { parseUnits } from 'viem'
 import { type BridgeParams, type BridgeQuote, StargateService } from '@/lib/stargate'
 
 export interface BridgeState {
@@ -59,38 +59,52 @@ export function useStargateBridge() {
   })
 
   const getQuote = useCallback(async (params: BridgeParams) => {
-    setState(prev => ({ ...prev, isQuoting: true, error: null }))
+    setState(prev => ({ ...prev, isQuoting: true, error: null, quote: null }))
 
     try {
-      const quote = await StargateService.getQuote(params)
+      const enrichedParams = {
+        ...params,
+        srcAddress: address,
+        dstAddress: address,
+      }
+      const quote = await StargateService.getQuote(enrichedParams)
       setState(prev => ({ ...prev, quote, isQuoting: false }))
       return quote
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to get quote'
       setState(prev => ({ ...prev, error: errorMessage, isQuoting: false }))
-      throw error
+      return null
     }
-  }, [])
+  }, [address])
 
   const executeBridge = useCallback(async (params: BridgeParams) => {
     if (!isConnected || !address) {
-      throw new Error('Wallet not connected')
+      setState(prev => ({ ...prev, error: 'Wallet not connected' }))
+      return
     }
 
     setState(prev => ({ ...prev, isBridging: true, error: null }))
 
     try {
-      // Get a fresh quote for the transaction
-      const quote = await StargateService.getQuote(params)
+      // Get a fresh quote
+      const quote = await StargateService.getQuote({
+        ...params,
+        srcAddress: address,
+        dstAddress: address,
+      })
 
-      // Pad address to bytes32
+      if (quote.error) {
+        throw new Error(quote.error)
+      }
+
+      const decimals = StargateService.getTokenDecimals(params.fromToken)
       const toBytes32 = ('0x' + address.slice(2).padStart(64, '0')) as `0x${string}`
-      const amountLD = parseUnits(params.amount, 18)
-      const minAmountLD = (amountLD * 995n) / 1000n // 0.5% slippage
-      const nativeFee = quote.nativeFee ? BigInt(quote.nativeFee) : 0n
+      const amountLD = parseUnits(params.amount, decimals)
+      const minAmountLD = BigInt(quote.dstAmountMin || '0')
+      const nativeFee = BigInt(quote.nativeFee || '0')
 
       const txHash = await writeContract({
-        address: '0x8731d54E9D02c286767d56ac03e8037C07e01e98' as `0x${string}`, // Stargate router
+        address: '0x8731d54E9D02c286767d56ac03e8037C07e01e98' as `0x${string}`,
         abi: STARGATE_SEND_ABI,
         functionName: 'send',
         args: [
@@ -117,7 +131,6 @@ export function useStargateBridge() {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Bridge transaction failed'
       setState(prev => ({ ...prev, error: errorMessage, isBridging: false }))
-      throw error
     }
   }, [address, isConnected, writeContract])
 
