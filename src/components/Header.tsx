@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
 
 export default function Header() {
   const [isDark, setIsDark] = useState(false)
@@ -20,6 +21,15 @@ export default function Header() {
         </div>
         
         <div className="flex items-center space-x-4">
+          {/* RainbowKit Connect Button */}
+          <div className="hidden sm:block">
+            <ConnectButton 
+              label="Connect"
+              showBalance={false}
+              chainStatus="icon"
+            />
+          </div>
+          
           {/* Dark/Light mode toggle */}
           <button
             onClick={toggleTheme}

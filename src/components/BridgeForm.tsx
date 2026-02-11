@@ -1,20 +1,81 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAccount, useConnect, useDisconnect } from 'wagmi'
 import { supportedChains, supportedTokens } from '@/lib/chains'
+import { useStargateBridge } from '@/hooks/useStargateBridge'
+import { StargateService } from '@/lib/stargate'
 
 export default function BridgeForm() {
+  const { address, isConnected } = useAccount()
+  const { connect, connectors } = useConnect()
+  const { disconnect } = useDisconnect()
+  
   const [fromChain, setFromChain] = useState(supportedChains[0])
   const [toChain, setToChain] = useState(supportedChains[1])
   const [selectedToken, setSelectedToken] = useState(supportedTokens[3]) // wBTC as shown in screenshot
   const [amount, setAmount] = useState('')
-  const [isConnected, setIsConnected] = useState(false)
+  
+  const { 
+    isQuoting, 
+    isBridging, 
+    quote, 
+    error, 
+    getQuote, 
+    executeBridge,
+    reset 
+  } = useStargateBridge()
 
   const swapChains = () => {
     const temp = fromChain
     setFromChain(toChain)
     setToChain(temp)
   }
+
+  const handleAmountChange = async (value: string) => {
+    setAmount(value)
+    reset()
+    
+    if (value && parseFloat(value) > 0) {
+      try {
+        await getQuote({
+          fromChainId: fromChain.id,
+          toChainId: toChain.id,
+          fromToken: selectedToken.symbol,
+          toToken: selectedToken.symbol,
+          amount: value,
+          slippage: 0.5, // 0.5%
+        })
+      } catch (error) {
+        console.error('Failed to get quote:', error)
+      }
+    }
+  }
+
+  const handleBridge = async () => {
+    if (!amount || !isConnected) return
+
+    try {
+      await executeBridge({
+        fromChainId: fromChain.id,
+        toChainId: toChain.id,
+        fromToken: selectedToken.symbol,
+        toToken: selectedToken.symbol,
+        amount,
+        slippage: 0.5,
+      })
+    } catch (error) {
+      console.error('Bridge failed:', error)
+    }
+  }
+
+  const handleConnect = () => {
+    if (connectors[0]) {
+      connect({ connector: connectors[0] })
+    }
+  }
+
+  const protocolFee = amount ? StargateService.calculateProtocolFee(amount) : '0'
 
   return (
     <div className="max-w-md mx-auto">
@@ -70,7 +131,7 @@ export default function BridgeForm() {
               <input
                 type="number"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => handleAmountChange(e.target.value)}
                 placeholder="0"
                 className="flex-1 bg-transparent text-2xl font-medium text-text-primary dark:text-primary-dark placeholder-gray-400 border-none outline-none"
               />
@@ -83,7 +144,9 @@ export default function BridgeForm() {
               </div>
             </div>
             <div className="flex items-center justify-between mt-2">
-              <span className="text-sm text-text-secondary dark:text-secondary-dark">0 {selectedToken.symbol} available</span>
+              <span className="text-sm text-text-secondary dark:text-secondary-dark">
+                {isConnected ? '0 ' + selectedToken.symbol + ' available' : 'Connect wallet to view balance'}
+              </span>
               <button className="text-sm text-gray-400 hover:text-text-secondary dark:hover:text-secondary-dark">Max</button>
             </div>
           </div>
@@ -92,26 +155,62 @@ export default function BridgeForm() {
         {/* Connect Wallet / Bridge Button */}
         {!isConnected ? (
           <button
-            onClick={() => setIsConnected(true)}
+            onClick={handleConnect}
             className="w-full py-4 bg-gradient-to-r from-telos-cyan via-telos-blue to-telos-purple text-white font-medium rounded-2xl hover:opacity-90 transition-opacity"
           >
             Connect wallet
           </button>
         ) : (
-          <button
-            disabled={!amount}
-            className="w-full py-4 bg-gradient-to-r from-telos-cyan via-telos-blue to-telos-purple text-white font-medium rounded-2xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {amount ? 'Bridge' : 'Enter amount'}
-          </button>
+          <div className="space-y-3">
+            {isConnected && (
+              <div className="text-center">
+                <p className="text-sm text-text-secondary dark:text-secondary-dark">
+                  Connected: {address?.slice(0, 6)}...{address?.slice(-4)}
+                </p>
+                <button
+                  onClick={() => disconnect()}
+                  className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 mt-1"
+                >
+                  Disconnect
+                </button>
+              </div>
+            )}
+            
+            <button
+              onClick={handleBridge}
+              disabled={!amount || isQuoting || isBridging}
+              className="w-full py-4 bg-gradient-to-r from-telos-cyan via-telos-blue to-telos-purple text-white font-medium rounded-2xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isBridging ? 'Bridging...' : isQuoting ? 'Getting quote...' : amount ? 'Bridge' : 'Enter amount'}
+            </button>
+          </div>
         )}
 
-        {/* Protocol Fee Notice */}
-        {amount && (
-          <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
-            <div className="text-sm text-blue-800 dark:text-blue-200">
-              Protocol fee: {(parseFloat(amount || '0') * 0.0006).toFixed(6)} {selectedToken.symbol} (0.06%)
+        {/* Error Message */}
+        {error && (
+          <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-xl">
+            <div className="text-sm text-red-800 dark:text-red-200">
+              {error}
             </div>
+          </div>
+        )}
+
+        {/* Quote Information */}
+        {quote && amount && (
+          <div className="mt-4 space-y-2">
+            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+              <div className="text-sm text-blue-800 dark:text-blue-200">
+                Protocol fee: {protocolFee} {selectedToken.symbol} (0.06%)
+              </div>
+            </div>
+            
+            {quote.nativeFee && (
+              <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl">
+                <div className="text-sm text-yellow-800 dark:text-yellow-200">
+                  Estimated gas: {parseFloat(quote.nativeFee).toFixed(4)} {fromChain.symbol}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
