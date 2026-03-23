@@ -1,4 +1,4 @@
-import {isAptosChainId, tryGetNetwork} from '@layerzerolabs/ui-core';
+import {tryGetNetwork} from '@layerzerolabs/ui-core';
 import {observer} from 'mobx-react';
 
 import {bridgeStore} from '@/bridge/stores/bridgeStore';
@@ -37,13 +37,7 @@ export const Alerts = observer(() => {
 
         {bridgeStore.isRegistering ? (
           <Box typography='p3' sx={{mt: 2}} color='text.secondary'>
-            Asset registration is only required during your first interaction with an asset on
-            Aptos. This is a mandatory Aptos security measure that will keep your wallet secure.
-          </Box>
-        ) : form.srcChainId && isAptosChainId(form.srcChainId) ? (
-          <Box typography='p3' sx={{mt: 2}} color='success.main'>
-            Transfers from Aptos are subject to a 3 day transfer window and will be available in 72
-            hours.
+            Asset registration is only required during your first interaction with an asset.
           </Box>
         ) : null}
 

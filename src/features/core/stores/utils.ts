@@ -1,7 +1,6 @@
 import {
   Currency,
   CurrencyAmount,
-  isAptosChainId,
   isEvmChainId,
   isSolanaChainId,
 } from '@layerzerolabs/ui-core';
@@ -13,7 +12,6 @@ import {walletStore} from './walletStore';
 export function getWalletForCurrency(currency: Currency): ActiveWallet<unknown> | undefined {
   const chainId = currency.chainId;
   if (isSolanaChainId(chainId)) return walletStore.solana;
-  if (isAptosChainId(chainId)) return walletStore.aptos;
   if (isEvmChainId(chainId)) return walletStore.evm;
   return undefined;
 }

@@ -13,7 +13,6 @@ import {
   getNativeCurrency,
   getScanLink,
   getTransactionLink,
-  isAptosChainId,
   isEvmChainId,
   isNativeCurrency,
   isSolanaChainId,
@@ -254,8 +253,6 @@ export class BridgeStore {
       const error: string | undefined = srcCurrency
         ? srcCurrency.chainId === dstChainId
           ? 'Transfers between same chain not available'
-          : isAptosChainId(srcCurrency.chainId) && isAptosChainId(dstChainId)
-          ? 'Transfers between APTOS not available'
           : findMatchingCurrencyOnChain(srcCurrency, dstChainId) === undefined
           ? `${fiatStore.getSymbol(srcCurrency)} is not available on ${
               tryGetNetwork(dstChainId)?.name
@@ -274,7 +271,6 @@ export class BridgeStore {
   get dstWallet(): Wallet<unknown> | undefined {
     const {dstChainId} = this.form;
     if (dstChainId) {
-      if (isAptosChainId(dstChainId)) return walletStore.aptos;
       if (isSolanaChainId(dstChainId)) return walletStore.solana;
       if (isEvmChainId(dstChainId)) return walletStore.evm;
     }
@@ -284,7 +280,6 @@ export class BridgeStore {
   get srcWallet(): Wallet<unknown> | undefined {
     const {srcChainId} = this.form;
     if (srcChainId) {
-      if (isAptosChainId(srcChainId)) return walletStore.aptos;
       if (isSolanaChainId(srcChainId)) return walletStore.solana;
       if (isEvmChainId(srcChainId)) return walletStore.evm;
     }
@@ -325,12 +320,6 @@ export class BridgeStore {
     const {srcBalance, srcNativeCost} = this;
     if (!srcChainId) return undefined;
     if (!srcBalance) return undefined;
-    if (isAptosChainId(srcChainId)) {
-      const {limitAmount} = this;
-      if (!limitAmount) return undefined;
-      if (limitAmount.lessThan(srcBalance)) return limitAmount;
-      return srcBalance;
-    }
     if (isEvmChainId(srcChainId)) {
       if (!srcNativeCost) return undefined;
       if (!srcBalance.currency.equals(srcNativeCost.currency)) return srcBalance;
@@ -741,9 +730,6 @@ export class BridgeStore {
               txHash: message.dstTxHash,
             },
           });
-          if (isAptosChainId(dstChainId)) {
-            unclaimedStore.updateUnclaimedBalance(dstCurrency, dstAddress);
-          }
         })
         .finally(() => {
           this.updateBalances();
@@ -885,13 +871,11 @@ export class BridgeStore {
   });
 
   async updateBalances() {
-    const {evm, aptos} = walletStore;
+    const {evm} = walletStore;
     const allTokens = getAllTokens();
     const promises = allTokens.map((token) => {
       if (evm && isEvmChainId(token.chainId)) {
         balanceStore.updateBalance(token, evm.address);
-      } else if (aptos && isAptosChainId(token.chainId)) {
-        balanceStore.updateBalance(token, aptos.address);
       }
     });
     return Promise.allSettled(promises);
@@ -1023,10 +1007,6 @@ function findMatchingCurrencyOnChain(currency: Currency, chainId: ChainId) {
 function isSrcCurrencyValid(srcCurrency: Currency) {
   const {dstChainId, dstCurrency} = bridgeStore.form;
   if (!dstChainId) return true;
-  // both can't be aptos
-  if (isAptosChainId(dstChainId) && isAptosChainId(srcCurrency.chainId)) return false;
-  // one has to be aptos
-  if (!isAptosChainId(dstChainId) && !isAptosChainId(srcCurrency.chainId)) return false;
   if (dstCurrency) {
     return isValidPair(srcCurrency, dstCurrency);
   }
@@ -1083,17 +1063,6 @@ function getAllTokens(): Currency[] {
 }
 
 export function initBridgeStore() {
-  const updateUnclaimedBalance = () => {
-    const {aptos} = walletStore;
-    if (!aptos) return;
-    bridgeStore.currencies
-      .filter((token) => isAptosChainId(token.chainId))
-      .filter((token) => !isNativeCurrency(token))
-      .forEach((token) => {
-        unclaimedStore.updateUnclaimedBalance(token, aptos.address);
-      });
-  };
-
   const updateEvmBalance = () => {
     const {evm} = walletStore;
     if (!evm) return;
@@ -1101,18 +1070,6 @@ export function initBridgeStore() {
       .filter((token) => isEvmChainId(token.chainId))
       .forEach((token) => {
         balanceStore.updateBalance(token, evm.address);
-      });
-  };
-
-  const updateAptosBalance = () => {
-    const {aptos} = walletStore;
-    if (!aptos) return;
-    const {address} = aptos;
-
-    getAllTokens()
-      .filter((token) => isAptosChainId(token.chainId))
-      .forEach((token) => {
-        balanceStore.updateBalance(token, address);
       });
   };
 
@@ -1176,8 +1133,6 @@ export function initBridgeStore() {
     // each in separate `thread`
     autorun(() => updateSolanaBalance()),
     autorun(() => updateEvmBalance()),
-    autorun(() => updateAptosBalance()),
-    autorun(() => updateUnclaimedBalance()),
     autorun(() => updateMessageFee()),
     autorun(() => updateExtraGas()),
     autorun(() => updateOutput()),
@@ -1187,7 +1142,6 @@ export function initBridgeStore() {
     autorun(() => updateAllowance()),
     // refresh
     interval(() => updateEvmBalance(), 30_000),
-    interval(() => updateAptosBalance(), 30_000),
   ];
 
   // unregister
