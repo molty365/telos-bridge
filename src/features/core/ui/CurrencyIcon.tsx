@@ -25,7 +25,7 @@ export const getTokenIcon = (symbol: string): string => {
     case 'VC':
       return 'https://raw.githubusercontent.com/telosnetwork/token-list/master/logos/VC.png';
     case TLOS_SYMBOL:
-      return 'https://raw.githubusercontent.com/telosnetwork/token-list/main/logos/telos.png';
+      return '/tlos-icon.png';
     default:
       return getCurrencyIcon(symbol);
   }
