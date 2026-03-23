@@ -1,4 +1,3 @@
-import {AptosSigner} from '@layerzerolabs/ui-aptos';
 import {ChainType} from '@layerzerolabs/ui-core';
 import {SolanaSigner} from '@layerzerolabs/ui-solana';
 import {ActiveWallet, Wallet} from '@layerzerolabs/ui-wallet';
@@ -39,10 +38,6 @@ export class WalletStore {
 
   get solana(): ActiveWallet<SolanaSigner> | undefined {
     return this.active.find((w) => w.chainType === ChainType.SOLANA) as ActiveWallet<SolanaSigner>;
-  }
-
-  get aptos(): ActiveWallet<AptosSigner> | undefined {
-    return this.active.find((w) => w.chainType === ChainType.APTOS) as ActiveWallet<AptosSigner>;
   }
 
   addWallets(wallets: Record<string, Wallet<unknown>>) {

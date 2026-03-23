@@ -1,4 +1,4 @@
-import {Currency, CurrencyAmount, getScanLink, isAptosChainId} from '@layerzerolabs/ui-core';
+import {Currency, CurrencyAmount, getScanLink, isEvmChainId} from '@layerzerolabs/ui-core';
 import assert from 'assert';
 import {autorun, flow, makeAutoObservable, ObservableMap} from 'mobx';
 import {toast} from 'react-toastify';
@@ -91,7 +91,7 @@ class UnclaimedStore {
     assert(bridge);
     try {
       this.isExecuting = true;
-      const wallet = walletStore.aptos;
+      const wallet = walletStore.evm;
       assert(wallet);
 
       const claimingAmount: Awaited<ReturnType<typeof bridge['getUnclaimed']>> =
@@ -166,9 +166,9 @@ function toKey(currency: Currency, address: string) {
 export const unclaimedStore = new UnclaimedStore();
 
 export function initUnclaimedStore(unclaimedStore: UnclaimedStore) {
-  function updateAptosBalance() {
-    const wallet = walletStore.aptos;
-    const currencies = unclaimedStore.currencies.filter((c) => isAptosChainId(c.chainId));
+  function updateEvmUnclaimedBalance() {
+    const wallet = walletStore.evm;
+    const currencies = unclaimedStore.currencies.filter((c) => isEvmChainId(c.chainId));
     const strategies = unclaimedStore.apis.slice();
 
     if (!wallet?.address) return;
@@ -179,8 +179,7 @@ export function initUnclaimedStore(unclaimedStore: UnclaimedStore) {
   }
 
   const handlers = [
-    //
-    autorun(() => updateAptosBalance()),
+    autorun(() => updateEvmUnclaimedBalance()),
   ];
   // unregister
   return () => {

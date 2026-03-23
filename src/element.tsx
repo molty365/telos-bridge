@@ -1,7 +1,6 @@
 import '../styles/style.css';
 import 'react-toastify/dist/ReactToastify.css';
 
-import {mainnet as aptos_mainnet} from '@layerzerolabs/ui-bridge-aptos';
 import {createFailoverProviderFactory} from '@layerzerolabs/ui-evm';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {observer} from 'mobx-react';
@@ -80,7 +79,7 @@ class LzBridgeElement extends HTMLElement {
       {
         bridge: {
           gasDrop: [],
-          aptos: [aptos_mainnet],
+          aptos: [],
           onft: [],
           stargate: {
             partner: config?.stargate?.partner,
