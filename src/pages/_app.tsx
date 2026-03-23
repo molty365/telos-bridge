@@ -2,8 +2,9 @@ import '../../styles/style.css';
 import 'react-toastify/dist/ReactToastify.css';
 import '../globals';
 
-import {IconTheme, setIconTheme} from '@layerzerolabs/ui-core';
-import {createFailoverProviderFactory} from '@layerzerolabs/ui-evm';
+import {IconTheme, setIconTheme, NETWORKS} from '@layerzerolabs/ui-core';
+import {createFailoverProviderFactory, createHttpsRpcMap} from '@layerzerolabs/ui-evm';
+import {ChainId} from '@layerzerolabs/lz-sdk';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {observer} from 'mobx-react';
 import React, {useEffect} from 'react';
@@ -24,7 +25,11 @@ import {appConfig} from '../config';
 
 const queryClient = new QueryClient();
 
-const failoverProvider = createFailoverProviderFactory();
+// Override Telos RPC: mainnet.telos.net/evm is deprecated (404)
+const rpcMap = createHttpsRpcMap(NETWORKS, {});
+rpcMap[ChainId.TELOS] = [{url: 'https://rpc.telos.net', timeout: 10000}];
+
+const failoverProvider = createFailoverProviderFactory(rpcMap);
 const multicallProvider = createMulticallProviderFactory(failoverProvider);
 
 bootstrap(appConfig, multicallProvider);
