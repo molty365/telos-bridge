@@ -1,7 +1,9 @@
 import '../styles/style.css';
 import 'react-toastify/dist/ReactToastify.css';
 
-import {createFailoverProviderFactory} from '@layerzerolabs/ui-evm';
+import {createFailoverProviderFactory, createHttpsRpcMap} from '@layerzerolabs/ui-evm';
+import {NETWORKS} from '@layerzerolabs/ui-core';
+import {ChainId} from '@layerzerolabs/lz-sdk';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {observer} from 'mobx-react';
 import React, {useEffect} from 'react';
@@ -24,7 +26,11 @@ import {createMulticallProviderFactory} from '@/core/utils/multicall';
 
 import {bootstrap} from './bootstrap';
 
-const failoverProvider = createFailoverProviderFactory();
+// Override Telos RPC: mainnet.telos.net/evm is deprecated (404)
+const rpcMap = createHttpsRpcMap(NETWORKS, {});
+rpcMap[ChainId.TELOS] = [{url: 'https://rpc.telos.net', timeout: 10000}];
+
+const failoverProvider = createFailoverProviderFactory(rpcMap);
 const multicallProvider = createMulticallProviderFactory(failoverProvider);
 
 class LzTrackerElement extends HTMLElement {
