@@ -74,7 +74,7 @@ export function createWallets(chains: ChainId[]): Record<string, Wallet<unknown>
     optionalChains: evmChains,
     rpcMap: {
       [ChainListId.TELOS]: 'https://rpc.telos.net',
-      [ChainListId.POLYGON]: 'https://polygon-rpc.com/',
+      [ChainListId.POLYGON]: 'https://rpc.ankr.com/polygon',
       [ChainListId.ARBITRUM]: 'https://arb1.arbitrum.io/rpc',
       [ChainListId.BNB]: 'https://bsc-dataseed.binance.org/',
       [ChainListId.AVALANCHE]: 'https://api.avax.network/ext/bc/C/rpc',
